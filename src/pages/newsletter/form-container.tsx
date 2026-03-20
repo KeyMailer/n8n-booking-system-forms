@@ -48,6 +48,7 @@ import { countWords } from "../../lib/helper/text-helper";
 import FormInformation from "./form-information";
 import { toast } from "sonner";
 
+import { useNavigate } from "react-router-dom";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type SubmissionMode = "single" | "multiple";
@@ -419,6 +420,8 @@ export default function FormContainer() {
   const isMultiple = submissionMode === "multiple";
   const canAddMore = entries.length < MAX_SUBMISSIONS;
 
+  const navigate = useNavigate();
+
   function handleNewsletterTypeChange(val: string) {
     setNewsletterType(val);
     if (!NEWSLETTER_SHOWS_MODE.includes(val)) {
@@ -490,10 +493,22 @@ export default function FormContainer() {
         submittedAt: new Date().toISOString(),
       };
 
-      await axios.post(URL, payload); // 🔁 replace with your actual endpoint
+      const response = await axios.post(URL, payload); // 🔁 replace with your actual endpoint
 
-      // Success — optionally reset or show toast
-      alert("Newsletter booked successfully!");
+      // ✅ Get message from webhook response
+      const data = response.data;
+      const message = Array.isArray(data) ? data[0]?.message : data?.message;
+
+      // ✅ Use toast instead of alert
+      toast.success(message, {
+        position: "top-right",
+        style: {
+          background: "#16a34a", // green
+          color: "#ffffff",
+        },
+      });
+
+      // Reset form
       setName("");
       setNewsletterType("");
       setSubmissionMode("single");
@@ -508,9 +523,16 @@ export default function FormContainer() {
         // Handle both array response [ { message: "..." } ] and object { message: "..." }
         const message = Array.isArray(data) ? data[0]?.message : data?.message;
 
+        // ✅ HANDLE 409 HERE
+        if (status === 409) {
+          sessionStorage.setItem("fullyBookedData", JSON.stringify(data[0])); // 👈 add [0]
+          navigate("/newsletter-booking/fully-booked");
+          return;
+        }
+
         if (status === 503) {
           toast.error(message || "Something went wrong. Please try again.", {
-            position: "bottom-right",
+            position: "top-right",
             style: {
               background: "#a50e0e",
               color: "#ffffff",
@@ -518,7 +540,7 @@ export default function FormContainer() {
           });
         } else {
           toast.error(message || "Something went wrong. Please try again.", {
-            position: "bottom-right",
+            position: "top-right",
             style: {
               background: "#a50e0e",
               color: "#ffffff",
