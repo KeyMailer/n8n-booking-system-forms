@@ -18,8 +18,8 @@ export default function FormInformation() {
         </ItemMedia>
         <ItemContent>
           <ItemTitle className="text-xs text-blue-600 dark:text-blue-400">
-            We accept a maximum of 13 bookings per day. Please plan your
-            placements accordingly.
+            We accept a maximum of 13 bookings per newsletter / day. Please plan
+            your placements accordingly.
           </ItemTitle>
         </ItemContent>
       </Item>

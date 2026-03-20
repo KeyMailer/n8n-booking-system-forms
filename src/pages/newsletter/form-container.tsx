@@ -495,6 +495,16 @@ export default function FormContainer() {
 
       const response = await axios.post(URL, payload); // 🔁 replace with your actual endpoint
 
+      // ✅ Handle 207 Partially Booked
+      if (response.status === 207) {
+        sessionStorage.setItem(
+          "partiallyBookedData",
+          JSON.stringify(response.data[0]),
+        );
+        navigate("/newsletter-booking/partially-booked");
+        return;
+      }
+
       // ✅ Get message from webhook response
       const data = response.data;
       const message = Array.isArray(data) ? data[0]?.message : data?.message;

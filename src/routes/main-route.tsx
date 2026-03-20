@@ -7,6 +7,7 @@ import MainPage from "../pages/main-page";
 import ErrorPage from "../pages/error/error-page";
 import MainNewsletterPage from "../pages/newsletter/main";
 import FullyBooked from "../pages/newsletter/fully-booked";
+import PartiallyBooked from "../pages/newsletter/partially-booked";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,11 @@ const router = createBrowserRouter([
       { path: "/", Component: MainPage },
       { path: "newsletter-booking", Component: MainNewsletterPage },
       { path: "newsletter-booking/fully-booked", Component: FullyBooked },
+      {
+        path: "newsletter-booking/partially-booked",
+        Component: PartiallyBooked,
+      },
+
       { path: "*", Component: ErrorPage },
     ],
   },
