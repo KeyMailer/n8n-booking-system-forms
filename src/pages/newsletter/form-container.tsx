@@ -697,13 +697,13 @@ export default function FormContainer() {
         {/* Submit */}
         <Button
           variant="default"
-          className="cursor-pointer py-5 bg-chart-4 dark:bg-[#1447E6] dark:text-white"
+          className={`cursor-pointer py-5 bg-[#EE3167] text-white`}
           type="button"
           onClick={handleSubmit}
           disabled={isLoading}
         >
           {isLoading ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-not-allowed">
               <span>Loading</span>
               <LoaderCircle className="animate-spin" />
             </div>

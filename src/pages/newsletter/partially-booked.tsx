@@ -6,12 +6,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   BookmarkX,
   CircleUser,
-  Info,
   MoveLeft,
   CalendarMinus,
   BookmarkCheck,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 // shadcn components
 import {
@@ -21,7 +20,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "../../components/ui/item";
-import { Badge } from "../../components/ui/badge";
+import NewsletterFullyBookedMsg from "./newsletter-fully-booked-msg";
 
 export default function PartiallyBooked() {
   const { state } = useLocation();
@@ -47,7 +46,7 @@ export default function PartiallyBooked() {
       // clear after 10 seconds
       const timer = setTimeout(() => {
         sessionStorage.removeItem("partiallyBookedData");
-      }, 600000);
+      }, 10000);
 
       return () => clearTimeout(timer);
     }
@@ -63,10 +62,10 @@ export default function PartiallyBooked() {
   }
 
   const {
-    message, // "Partial: 4 booked, 2 rejected"
     accepted = [], // array of confirmed bookings (id, date, productName, placementType, segment, purchaseType, slot)
     rejected = [], // array of failed bookings (id, date, productName, placementType, reason)
     userInput,
+    existingBookings,
   } = data;
 
   return (
@@ -78,7 +77,7 @@ export default function PartiallyBooked() {
         className="flex items-center gap-2 w-fit"
       >
         <MoveLeft />
-        <span>Back</span>
+        <span>Book Again</span>
       </Button>
 
       {/* header */}
@@ -94,7 +93,9 @@ export default function PartiallyBooked() {
 
       {/*user submission data */}
       <div className="mt-10">
-        <h2 className="font-semibold text-lg mb-3">Your Submission Attempt</h2>
+        <h2 className="font-semibold text-lg mb-3">
+          Your Submission Attempt ({userInput.entries.length})
+        </h2>
 
         <Item variant="outline" className="items-start">
           <ItemMedia variant="icon">
@@ -118,69 +119,116 @@ export default function PartiallyBooked() {
                 .replace(",", "")}{" "}
               (PH time)
             </ItemTitle>
+
+            {userInput.entries?.map((entry: any, index: number) => (
+              <ItemDescription key={index} className="flex flex-col mt-2">
+                <span>Product Name: {entry.productName}</span>
+                <span>Placement: {entry.placementType}</span>
+                <span>
+                  Scheduled:{" "}
+                  {new Date(entry.date).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}
+                </span>
+                <span>Segment: {entry.segment}</span>
+                <span>Purchase Type: {entry.purchaseType}</span>
+              </ItemDescription>
+            ))}
           </ItemContent>
         </Item>
       </div>
 
-      {/*accepted bookings*/}
-      <div className="mt-10">
-        <h2 className="font-semibold text-lg mb-3 text-green-600">
-          Confirmed Bookings ({accepted.length})
-        </h2>
+      <div className="flex gap-5 my-10">
+        {/*accepted bookings*/}
+        <div className="w-1/2">
+          <h2 className="font-semibold text-lg mb-3 text-green-600">
+            Your Successful Bookings ({accepted.length})
+          </h2>
 
-        <div className="grid gap-4 ">
-          {accepted.map((accept: any) => (
-            <Item variant="muted" key={accept.id} className="items-start">
-              <ItemMedia variant="icon">
-                <BookmarkCheck className="mt-1" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>Product Name: {accept.productName} </ItemTitle>
-                <ItemTitle>Placement: {accept.placementType} </ItemTitle>
-                <ItemTitle>Segment: {accept.segment} </ItemTitle>
-                <ItemTitle>Purchase Type: {accept.purchaseType} </ItemTitle>
-              </ItemContent>
-            </Item>
-          ))}
+          <div className="grid gap-4 ">
+            {accepted.map((accept: any) => (
+              <Item variant="muted" key={accept.id} className="items-start">
+                <ItemMedia variant="icon">
+                  <BookmarkCheck className="mt-1" />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>Product Name: {accept.productName} </ItemTitle>
+                  <ItemTitle>Placement: {accept.placementType} </ItemTitle>
+                  <ItemDescription className="flex flex-col mt-2">
+                    <span>Scheduled: {accept.date}</span>
+                    <span>Segment: {accept.segment}</span>
+                    <span>Purchase Type: {accept.purchaseType}</span>
+                  </ItemDescription>
+                </ItemContent>
+              </Item>
+            ))}
+          </div>
+        </div>
+
+        {/*rejected bookings*/}
+        <div className="w-1/2">
+          <h2 className="font-semibold text-lg mb-3 text-destructive">
+            Your Failed Bookings ({rejected.length})
+          </h2>
+
+          <div className="grid gap-4 ">
+            {rejected.map((reject: any) => (
+              <Item variant="muted" key={reject.id} className="items-start">
+                <ItemMedia variant="icon">
+                  <BookmarkX className="mt-1" />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>Product Name: {reject.productName} </ItemTitle>
+                  <ItemTitle>Placement: {reject.placementType} </ItemTitle>
+                  <ItemTitle>Scheduled: {reject.date} </ItemTitle>
+
+                  <ItemDescription className="mt-2">
+                    Reason: {reject.reason}
+                  </ItemDescription>
+                </ItemContent>
+              </Item>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/*rejected bookings*/}
-      <div className="mt-10">
-        <h2 className="font-semibold text-lg mb-3 text-destructive">
-          Rejected Bookings ({rejected.length})
-        </h2>
+      {/* existing bookings */}
+      {existingBookings.length > 0 && (
+        <React.Fragment>
+          <h2 className="font-semibold text-lg mb-3">
+            Existing Bookings ({existingBookings.length})
+          </h2>
 
-        <div className="grid gap-4 ">
-          {rejected.map((reject: any) => (
-            <Item variant="muted" key={reject.id} className="items-start">
-              <ItemMedia variant="icon">
-                <BookmarkX className="mt-1" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>Product Name: {reject.productName} </ItemTitle>
-                <ItemTitle>Placement: {reject.placementType} </ItemTitle>
-                <ItemTitle>Scheduled: {reject.date} </ItemTitle>
-                <ItemDescription>{reject.reason}</ItemDescription>
-              </ItemContent>
-            </Item>
-          ))}
-        </div>
-      </div>
+          <div className="grid gap-4">
+            {existingBookings.map((booking: any) => (
+              <Item variant="muted" key={booking.row_number}>
+                <ItemMedia variant="icon">
+                  <BookmarkCheck />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>Booked By: {booking.point_person}</ItemTitle>
+                  <ItemTitle>
+                    Submitted At: {booking.submitted_at} (PH time)
+                  </ItemTitle>
+
+                  <ItemDescription className="flex flex-col mt-2">
+                    <span>Product Name: {booking.product_name}</span>
+                    <span>Placement: {booking.newsletter_placement}</span>
+                    <span>Scheduled: {booking.date_schedule}</span>
+                    <span>Segment: {booking.segment}</span>
+                    <span>Purchase Type: {booking.purchase_type}</span>
+                  </ItemDescription>
+                </ItemContent>
+              </Item>
+            ))}
+          </div>
+        </React.Fragment>
+      )}
 
       {/* information section */}
-      <Item variant="outline" className="border-chart-1 mt-2">
-        <ItemMedia variant="icon">
-          <Info className="text-blue-600 dark:text-blue-400" />
-        </ItemMedia>
-        <ItemContent>
-          <ItemTitle className="text-xs text-blue-600 dark:text-blue-400">
-            Try to rebook this rejected booking on a different schedule, or if
-            you insist, talk to one of your colleagues to adjust their schedule
-            for the specific placement type.
-          </ItemTitle>
-        </ItemContent>
-      </Item>
+      <NewsletterFullyBookedMsg />
     </div>
   );
 }

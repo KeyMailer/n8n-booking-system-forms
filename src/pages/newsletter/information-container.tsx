@@ -5,6 +5,8 @@ import {
   ItemTitle,
 } from "../../components/ui/item";
 
+import { Separator } from "../../components/ui/separator";
+
 export default function InformationContainer() {
   return (
     <div className="w-full lg:w-1/3 lg:sticky lg:top-5 h-fit">
@@ -47,7 +49,8 @@ export default function InformationContainer() {
             Note: If a Featured Demo is present, the standard maximum has been
             reduced to 5.
           </ItemDescription>
-          <div className="border-t-2"></div>
+
+          <Separator />
 
           <ItemTitle className="mt-3 mb-2">
             Press Newsletter (Monday, Wednesday, & Friday)

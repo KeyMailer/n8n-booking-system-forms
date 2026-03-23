@@ -4,20 +4,21 @@ type ThemeContextType = {
   toggleButton: () => void;
 };
 
-// icons
-import { Eclipse } from "lucide-react";
-import { Button } from "./ui/button";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 export default function ThemeToggle({
   isDark,
   toggleButton,
 }: ThemeContextType) {
   return (
-    <Button variant="ghost" onClick={toggleButton} className="p-2">
-      <Eclipse
-        size={20}
-        className={`transition ${isDark ? "rotate-180" : ""}`}
+    <div className="flex items-center space-x-2">
+      <Switch
+        checked={isDark}
+        onCheckedChange={toggleButton}
+        className="cursor-pointer"
       />
-    </Button>
+      <Label>{isDark ? "Dark Mode" : "Light Mode"}</Label>
+    </div>
   );
 }

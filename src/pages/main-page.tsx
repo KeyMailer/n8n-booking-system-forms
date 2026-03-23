@@ -1,12 +1,12 @@
-import CardTools from "../components/card-tools";
+import ItemTools from "../components/item-tools";
 
 import { tools } from "../lib/tools-data";
 
 export default function MainPage() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-5 mx-auto 2xl:max-w-7xl">
+    <div className="grid grid-cols-1 sm:grid-cols-2  gap-5 max-w-7xl mx-auto px-5">
       {tools.map((tool) => (
-        <CardTools
+        <ItemTools
           key={tool.path}
           name={tool.name}
           description={tool.description}
