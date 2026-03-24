@@ -30,7 +30,10 @@ export default function FullyBookedSingleMode({
       {/* header */}
       <div className="flex flex-col gap-2 items-center justify-center text-center">
         <CalendarX2 size={28} className="text-destructive" />
-        <p className="font-bold text-2xl">This {newsletter} is Fully Booked</p>
+        <p className="font-bold text-2xl">
+          {userInput.newsletterType !== "Both" && `This ${newsletter} is `}
+          Fully Booked
+        </p>
 
         <p className="text-foreground max-w-xl">{message}</p>
       </div>
@@ -48,7 +51,12 @@ export default function FullyBookedSingleMode({
             </ItemMedia>
             <ItemContent>
               <ItemTitle>Name: {userInput.name}</ItemTitle>
-              <ItemTitle>Newsletter: {userInput.newsletterType}</ItemTitle>
+              <ItemTitle>
+                Newsletter:{" "}
+                {userInput.newsletterType === "Both"
+                  ? "Influencer & Press (Both)"
+                  : userInput.newsletterType}
+              </ItemTitle>
               <ItemTitle>
                 {" "}
                 Submitted At:{" "}
@@ -105,6 +113,9 @@ export default function FullyBookedSingleMode({
                 </ItemMedia>
                 <ItemContent>
                   <ItemTitle>Booked By: {booking.point_person}</ItemTitle>
+                  {userInput.newsletterType === "Both" && (
+                    <ItemTitle>Newsletter: {booking.newsletter_type}</ItemTitle>
+                  )}
                   <ItemTitle>
                     Submitted At: {booking.submitted_at} (PH time)
                   </ItemTitle>

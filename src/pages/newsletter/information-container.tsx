@@ -5,81 +5,76 @@ import {
   ItemTitle,
 } from "../../components/ui/item";
 
-import { Separator } from "../../components/ui/separator";
-
 export default function InformationContainer() {
   return (
-    <div className="w-full lg:w-1/3 lg:sticky lg:top-5 h-fit">
-      {/*information */}
-
-      <Item variant="muted">
+    <div className="w-full lg:w-1/4 lg:sticky lg:top-5 h-fit ml-auto">
+      <Item variant={"muted"}>
         <ItemContent>
-          <ItemTitle className="text-lg">
-            Newsletter Schedule & Capacity
-          </ItemTitle>
+          <ItemTitle>Quick Note</ItemTitle>
+          <ItemDescription className="line-clamp-5">
+            Influencer: Mon & Fri only. Press: Mon, Wed & Fri. Both: Mon & Fri
+            only.
+          </ItemDescription>
+        </ItemContent>
+      </Item>
+      {/* influencer */}
+      <Item className="my-2" variant={"muted"}>
+        <ItemContent>
+          <ItemTitle>Influencer Newsletter</ItemTitle>
+          <ItemDescription>
+            Below are the maximum slots for each placement.
+          </ItemDescription>
 
-          <ItemTitle className="mt-5 mb-2">
-            Influencer Newsletter (Monday & Friday)
-          </ItemTitle>
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="mt-3 flex justify-between text-black dark:text-white ">
             <span>Featured</span>
-
             <span>1 max</span>
           </ItemDescription>
-
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="flex justify-between text-black dark:text-white ">
             <span>Featured Demo</span>
-
             <span>1 max</span>
           </ItemDescription>
-
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="flex justify-between text-black dark:text-white ">
             <span>Promoted</span>
-
             <span>6 max</span>
           </ItemDescription>
-
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="flex justify-between text-black dark:text-white ">
             <span>Standard</span>
-
             <span>6 max</span>
           </ItemDescription>
 
-          <ItemDescription className="mt-5 mb-3 text-xs">
+          <ItemDescription className="mt-5 line-clamp-3">
             Note: If a Featured Demo is present, the standard maximum has been
             reduced to 5.
           </ItemDescription>
+        </ItemContent>
+      </Item>
 
-          <Separator />
+      {/* press */}
+      <Item variant={"muted"}>
+        <ItemContent>
+          <ItemTitle>Press Newsletter</ItemTitle>
+          <ItemDescription>
+            Below are the maximum slots for each placement.
+          </ItemDescription>
 
-          <ItemTitle className="mt-3 mb-2">
-            Press Newsletter (Monday, Wednesday, & Friday)
-          </ItemTitle>
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="mt-3 flex justify-between text-black dark:text-white ">
             <span>Featured</span>
-
             <span>1 max</span>
           </ItemDescription>
-
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="flex justify-between text-black dark:text-white ">
             <span>Featured Demo</span>
-
             <span>1 max</span>
           </ItemDescription>
-
-          <ItemDescription className="flex justify-between text-black dark:text-white  font-semibold">
+          <ItemDescription className="flex justify-between text-black dark:text-white ">
             <span>Promoted</span>
-
             <span>4 max</span>
           </ItemDescription>
-
-          <ItemDescription className="flex justify-between text-black dark:text-white font-semibold">
+          <ItemDescription className="flex justify-between text-black dark:text-white ">
             <span>Standard</span>
-
             <span>8 max</span>
           </ItemDescription>
 
-          <ItemDescription className="mt-5 mb-3 text-xs">
+          <ItemDescription className="mt-5 line-clamp-3">
             Note: If a Featured Demo is present, the standard maximum has been
             reduced to 7.
           </ItemDescription>

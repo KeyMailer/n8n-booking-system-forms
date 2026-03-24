@@ -162,7 +162,7 @@ function getDisabledDays(newsletterType: string) {
   } else if (newsletterType === "Press") {
     disabledDays = [...disabledDays, TUESDAY, THURSDAY];
   } else if (newsletterType === "Both") {
-    disabledDays = [...disabledDays, TUESDAY, THURSDAY];
+    disabledDays = [...disabledDays, TUESDAY, WEDNESDAY, THURSDAY];
   }
 
   return [{ before: today }, { dayOfWeek: disabledDays }];
