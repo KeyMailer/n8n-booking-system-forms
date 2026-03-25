@@ -401,7 +401,7 @@ function SubmissionBlock({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const URL = import.meta.env.VITE_N8N_API_URL;
+const URL = import.meta.env.VITE_N8N_API_NEWSLETTER_URL_PROD;
 
 export default function FormContainer() {
   const [name, setName] = useState("");
