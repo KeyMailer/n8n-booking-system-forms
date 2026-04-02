@@ -1,13 +1,14 @@
-// react
+// REACT
 import { useEffect } from "react";
 
-// react-router-dom
+// REACT-ROUTER-DOM
 import { Outlet, useLocation } from "react-router-dom";
 
-// components
+// COMPONENTS
 import Navbar from "../components/navbar/navbar";
+import Footer from "@/components/footer/footer";
 
-// tools data (displaying in main-page)
+// TOOLS DATA
 import { tools } from "../lib/tools-data";
 
 export default function Layout() {
@@ -21,13 +22,14 @@ export default function Layout() {
     const currentTool = tools.find((tool) =>
       location.pathname.startsWith(tool.path),
     );
-    document.title = currentTool?.name || "Booking Forms";
+    document.title = currentTool?.name || "KM - n8n Webhooks";
   }, [location.pathname]);
 
   return (
     <>
       {!shouldHideNavbar && <Navbar />}
       <Outlet />
+      {!shouldHideNavbar && <Footer />}
     </>
   );
 }

@@ -1,24 +1,25 @@
-/* context shape */
+/* CONTEXT TYPE */
 type ThemeContextType = {
   isDark: boolean;
   toggleButton: () => void;
 };
 
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
+// SHADCN COMPONENT
+import { Button } from "./ui/button";
+import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle({
   isDark,
   toggleButton,
 }: ThemeContextType) {
   return (
-    <div className="flex items-center space-x-2">
-      <Switch
-        checked={isDark}
-        onCheckedChange={toggleButton}
-        className="cursor-pointer"
-      />
-      <Label>{isDark ? "Dark Mode" : "Light Mode"}</Label>
-    </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleButton}
+      className="cursor-pointer"
+    >
+      {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+    </Button>
   );
 }

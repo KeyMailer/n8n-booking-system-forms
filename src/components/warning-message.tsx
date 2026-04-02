@@ -1,7 +1,10 @@
+// SHADCN COMPONENT
 import { Item, ItemContent, ItemMedia, ItemTitle } from "./ui/item";
 
+// ICONS
 import { TriangleAlert } from "lucide-react";
 
+// MESSAGE TYPE
 type MessageInputProps = {
   message: string;
 };

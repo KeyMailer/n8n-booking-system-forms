@@ -18,12 +18,12 @@ import {
 
 // COMPONENTS
 import PartiallyBookedHeader from "@/components/partially-booked-header";
-import NewsletterFullyBookedMsg from "./newsletter-fully-booked-msg";
+import SocialFullyBookedMsg from "./social-fully-booked-msg";
 import RedirectIfNoData from "@/components/redirect-if-no-data";
 import BookAgain from "@/components/book-again";
 
-export default function PartiallyBooked() {
-  // DATA PASSED FROM NAVIGATE (FORM-CONTAINER)
+export default function SocialPartiallyBooked() {
+  // DATA PASSED FROM THE NAVIGATE (FORM-CONTAINER)
   const { state } = useLocation();
 
   // PASSED DATA STORED HERE
@@ -40,17 +40,17 @@ export default function PartiallyBooked() {
     }
 
     // GET THE DATA FROM SESSION STORAGE
-    const storedData = sessionStorage.getItem("partiallyBookedData");
+    const storedData = sessionStorage.getItem("socialPartiallyBookedData");
     if (storedData) {
       try {
         setData(JSON.parse(storedData));
       } catch (e) {
-        console.error("Failed to parse partiallyBookedData", e);
+        console.error("Failed to parse socialPartiallyBookedData", e);
       }
 
-      // REMOVE AFTER 10 SECONDS
+      // REMOVE THE DATA AFTER 10 SECONDS
       const timer = setTimeout(() => {
-        sessionStorage.removeItem("partiallyBookedData");
+        sessionStorage.removeItem("socialPartiallyBookedData");
       }, 10000);
 
       setIsLoading(false);
@@ -65,20 +65,20 @@ export default function PartiallyBooked() {
 
   // IF THERE'S NO DATA RETURN REDIRECT IT
   if (!data) {
-    return <RedirectIfNoData data={data} redirectTo="/newsletter-booking" />;
+    return <RedirectIfNoData data={data} redirectTo="/social-booking" />;
   }
 
-  const {
-    accepted = [], // array of confirmed bookings (id, date, productName, placementType, segment, purchaseType, slot)
-    rejected = [], // array of failed bookings (id, date, productName, placementType, reason)
-    userInput,
-    existingBookings,
-  } = data;
+  const { userInput, entries, existingBookings = [] } = data;
+
+  // FLATTEN ENTRIES
+  const allEntries = [...entries.success, ...entries.failed];
+
+  const totalEntries = allEntries.length;
 
   return (
     <div className="p-5 mx-auto 2xl:max-w-5xl">
-      {/* BACK TO NEWSLETTER BOOKING */}
-      <BookAgain to="/newsletter-booking" />
+      {/* BACK TO SOCIAL BOOKING */}
+      <BookAgain to="/social-booking" />
 
       {/* HEADER */}
       <PartiallyBookedHeader />
@@ -86,7 +86,7 @@ export default function PartiallyBooked() {
       {/* USER SUBMISSION DATA */}
       <div className="mt-10">
         <h2 className="font-semibold text-lg mb-3">
-          Your Submission Attempt ({userInput.entries.length})
+          Your Submission Attempt ({totalEntries})
         </h2>
 
         <Item variant="outline" className="items-start">
@@ -94,10 +94,8 @@ export default function PartiallyBooked() {
             <CircleUser className="mt-1" />
           </ItemMedia>
           <ItemContent>
-            <ItemTitle>Name: {userInput.name} </ItemTitle>
-            <ItemTitle>Newsletter: {userInput.newsletterType} </ItemTitle>
+            <ItemTitle>Name: {userInput.name}</ItemTitle>
             <ItemTitle>
-              {" "}
               Submitted At:{" "}
               {new Date(userInput.submittedAt)
                 .toLocaleString("en-US", {
@@ -112,10 +110,12 @@ export default function PartiallyBooked() {
               (PH time)
             </ItemTitle>
 
-            {userInput.entries?.map((entry: any, index: number) => (
+            {allEntries.map((entry: any, index: number) => (
               <ItemDescription key={index} className="flex flex-col mt-2">
                 <span>Product Name: {entry.productName}</span>
-                <span>Placement: {entry.placementType}</span>
+                <span>Ad Type: {entry.adType}</span>
+                <span>Social Post Type: {entry.socialPostType}</span>
+                <span>Platform: {entry.platform}</span>
                 <span>
                   Scheduled:{" "}
                   {new Date(entry.date).toLocaleDateString("en-US", {
@@ -124,34 +124,40 @@ export default function PartiallyBooked() {
                     year: "numeric",
                   })}
                 </span>
-                <span>Segment: {entry.segment}</span>
-                <span>Purchase Type: {entry.purchaseType}</span>
               </ItemDescription>
             ))}
           </ItemContent>
         </Item>
       </div>
 
+      {/* ENTRIES BOOKING DATA (ACCEPT AND FAILED) */}
       <div className="flex gap-5 my-10">
-        {/* ACCEPTED BOOKINGS */}
+        {/* ACCEPTED BOOKINGS*/}
         <div className="w-1/2">
           <h2 className="font-semibold text-lg mb-3 text-green-600">
-            Your Successful Bookings ({accepted.length})
+            Your Successful Bookings ({entries.success.length})
           </h2>
 
-          <div className="grid gap-4 ">
-            {accepted.map((accept: any) => (
-              <Item variant="muted" key={accept.id} className="items-start">
+          <div className="grid gap-4">
+            {entries.success.map((accept: any) => (
+              <Item variant={"muted"} key={accept.id} className="items-start">
                 <ItemMedia variant="icon">
                   <BookmarkCheck className="mt-1" />
                 </ItemMedia>
                 <ItemContent>
-                  <ItemTitle>Product Name: {accept.productName} </ItemTitle>
-                  <ItemTitle>Placement: {accept.placementType} </ItemTitle>
+                  <ItemTitle>Product Name: {accept.productName}</ItemTitle>
+                  <ItemTitle>Ad Type: {accept.adType}</ItemTitle>
                   <ItemDescription className="flex flex-col mt-2">
-                    <span>Scheduled: {accept.date}</span>
-                    <span>Segment: {accept.segment}</span>
-                    <span>Purchase Type: {accept.purchaseType}</span>
+                    <span>Social Post Type: {accept.socialPostType}</span>
+                    <span>Platform: {accept.platform}</span>
+                    <span>
+                      Scheduled:{" "}
+                      {new Date(accept.date).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </span>
                   </ItemDescription>
                 </ItemContent>
               </Item>
@@ -159,25 +165,34 @@ export default function PartiallyBooked() {
           </div>
         </div>
 
-        {/* REJECTED BOOKINGS */}
+        {/* FAILED BOOKINGS */}
         <div className="w-1/2">
           <h2 className="font-semibold text-lg mb-3 text-destructive">
-            Your Failed Bookings ({rejected.length})
+            Your Failed Bookings ({entries.failed.length})
           </h2>
 
-          <div className="grid gap-4 ">
-            {rejected.map((reject: any) => (
-              <Item variant="muted" key={reject.id} className="items-start">
+          <div className="grid gap-4">
+            {entries.failed.map((reject: any) => (
+              <Item variant={"muted"} key={reject.id} className="items-start">
                 <ItemMedia variant="icon">
                   <BookmarkX className="mt-1" />
                 </ItemMedia>
                 <ItemContent>
-                  <ItemTitle>Product Name: {reject.productName} </ItemTitle>
-                  <ItemTitle>Placement: {reject.placementType} </ItemTitle>
-                  <ItemTitle>Scheduled: {reject.date} </ItemTitle>
+                  <ItemTitle>Product Name: {reject.productName}</ItemTitle>
+                  <ItemTitle>Ad Type: {reject.adType}</ItemTitle>
+                  <ItemDescription className="flex flex-col mt-2">
+                    <span>Social Post Type: {reject.socialPostType}</span>
+                    <span>Platform: {reject.platform}</span>
+                    <span>
+                      Scheduled:{" "}
+                      {new Date(reject.date).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </span>
 
-                  <ItemDescription className="mt-2">
-                    Reason: {reject.reason}
+                    <span className="mt-2">Reason: {reject.reason}</span>
                   </ItemDescription>
                 </ItemContent>
               </Item>
@@ -195,10 +210,11 @@ export default function PartiallyBooked() {
 
           <div className="grid gap-4">
             {existingBookings.map((booking: any) => (
-              <Item variant="muted" key={booking.row_number}>
+              <Item variant={"muted"} key={booking.row_number}>
                 <ItemMedia variant="icon">
                   <BookmarkCheck />
                 </ItemMedia>
+
                 <ItemContent>
                   <ItemTitle>Booked By: {booking.point_person}</ItemTitle>
                   <ItemTitle>
@@ -207,10 +223,10 @@ export default function PartiallyBooked() {
 
                   <ItemDescription className="flex flex-col mt-2">
                     <span>Product Name: {booking.product_name}</span>
-                    <span>Placement: {booking.newsletter_placement}</span>
-                    <span>Scheduled: {booking.date_schedule}</span>
-                    <span>Segment: {booking.segment}</span>
-                    <span>Purchase Type: {booking.purchase_type}</span>
+                    <span>Ad Type: {booking.ad_type}</span>
+                    <span>Social Post Type: {booking.social_post_type}</span>
+                    <span>Platform: {booking.platform}</span>
+                    <span>Scheduled: {booking.date_scheduled}</span>
                   </ItemDescription>
                 </ItemContent>
               </Item>
@@ -220,7 +236,7 @@ export default function PartiallyBooked() {
       )}
 
       {/* INFORMATION SECTION */}
-      <NewsletterFullyBookedMsg />
+      <SocialFullyBookedMsg />
     </div>
   );
 }

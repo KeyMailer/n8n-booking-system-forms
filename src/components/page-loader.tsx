@@ -1,4 +1,5 @@
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "./ui/spinner"; // SHADCN COMPONENT
+
 export default function PageLoader() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center">

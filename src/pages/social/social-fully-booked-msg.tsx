@@ -9,7 +9,7 @@ import {
 // ICONS
 import { Info } from "lucide-react";
 
-export default function NewsletterFullyBookedMsg() {
+export default function SocialFullyBookedMsg() {
   return (
     <Item
       variant="muted"
@@ -23,7 +23,7 @@ export default function NewsletterFullyBookedMsg() {
           Try booking again on a different schedule. If you prefer the same
           slot, contact the person listed under “Booked By” in the existing
           bookings to see if they can adjust their schedule. If they agree, ask
-          Amy to update the placement’s scheduled date, then try booking again.
+          Ben to update the booking scheduled date, then try booking again.
         </ItemTitle>
       </ItemContent>
     </Item>

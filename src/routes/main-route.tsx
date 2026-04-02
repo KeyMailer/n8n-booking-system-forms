@@ -1,21 +1,33 @@
-// react-router-dom
-import { createBrowserRouter } from "react-router-dom";
+// REACT
 import { lazy, Suspense } from "react";
 
-// always eager, needed immediately
+// REACT-ROUTER-DOM
+import { createBrowserRouter } from "react-router-dom";
+
 import Layout from "./layout";
 import ErrorPage from "../pages/error/error-page";
 
-// lazy loaded, only fetched when the route is visited
+// MAIN PAGE
 const MainPage = lazy(() => import("../pages/main-page"));
+
+// NEWSLETTER
 const MainNewsletterPage = lazy(() => import("../pages/newsletter/main"));
 const FullyBooked = lazy(() => import("../pages/newsletter/fully-booked"));
 const PartiallyBooked = lazy(
   () => import("../pages/newsletter/partially-booked"),
 );
 
-// fallback component
+// SOCIAL
+const MainSocialPage = lazy(() => import("../pages/social/main"));
+const SocialFullyBooked = lazy(() => import("../pages/social/fully-booked"));
+const SocialPartiallyBooked = lazy(
+  () => import("../pages/social/partially-booked"),
+);
+
+// FALLBACK LOADING COMPONENTS
 import PageLoader from "../components/page-loader";
+import FormSkeleton from "@/components/form-skeleton";
+import MainSkeleton from "@/components/main-skeleton";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +37,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: (
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<MainSkeleton />}>
             <MainPage />
           </Suspense>
         ),
@@ -33,7 +45,7 @@ const router = createBrowserRouter([
       {
         path: "newsletter-booking",
         element: (
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<FormSkeleton />}>
             <MainNewsletterPage />
           </Suspense>
         ),
@@ -54,6 +66,34 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
+      {
+        path: "social-booking",
+        element: (
+          <Suspense fallback={<FormSkeleton />}>
+            <MainSocialPage />
+          </Suspense>
+        ),
+      },
+
+      {
+        path: "social-booking/fully-booked",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <SocialFullyBooked />
+          </Suspense>
+        ),
+      },
+
+      {
+        path: "social-booking/partially-booked",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <SocialPartiallyBooked />
+          </Suspense>
+        ),
+      },
+
       { path: "*", Component: ErrorPage },
     ],
   },

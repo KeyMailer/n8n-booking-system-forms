@@ -1,12 +1,13 @@
+// REACT
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-/* context shape */
+/* CONTEXT SHAPE */
 type ThemeContextType = {
   isDark: boolean;
   toggleButton: () => void;
 };
 
-/* create context */
+/* CREATE CONTEXT */
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -34,7 +35,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* custom hook with safety check */
+/* CUSTOM HOOK WTIH SAFETY CHECK */
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {

@@ -14,39 +14,39 @@ import {
 } from "../../components/ui/item";
 
 // COMPONENTS
-import NewsletterFullyBookedMsg from "./newsletter-fully-booked-msg";
+import SocialFullyBookedMsg from "./social-fully-booked-msg";
 
-// TYPE PROPS
-interface FullyBookedSingleModeProps {
-  newsletter: string;
-  message: string;
+// TYPES PROPS
+interface SocialFullyBookedSingleModeProps {
+  userInput: any;
   existingBookings: any[];
-  userInput?: any;
+  entry: any;
 }
 
-export default function FullyBookedSingleMode({
-  newsletter,
-  message,
-  existingBookings,
+export default function SocialFullyBookedSingleMode({
   userInput,
-}: FullyBookedSingleModeProps) {
+  existingBookings,
+  entry,
+}: SocialFullyBookedSingleModeProps) {
   return (
     <React.Fragment>
       {/* HEADER */}
       <div className="flex flex-col gap-2 items-center justify-center text-center">
         <CalendarX2 size={28} className="text-destructive" />
-        <p className="font-bold text-2xl">
-          {userInput.newsletterType !== "Both" && `This ${newsletter} is `}
-          Fully Booked
+        <p className="font-bold text-2xl">Fully Booked</p>
+
+        <p className="text-foreground max-w-xl">
+          Unfortunately, bookings for Platinum, Gold, and Silver ad types are
+          fully booked. We only accept a maximum of 2 bookings per day for these
+          ad types.
         </p>
-        <p className="text-foreground max-w-xl">{message}</p>
       </div>
 
       {/* USER SUBMISSION DATA */}
-      {userInput && (
+      {entry && (
         <div className="mt-10">
           <h2 className="font-semibold text-lg mb-3">
-            Your Submission Attempt ({userInput.entries.length})
+            Your Submission Attempt (1)
           </h2>
 
           <Item variant={"outline"}>
@@ -55,12 +55,6 @@ export default function FullyBookedSingleMode({
             </ItemMedia>
             <ItemContent>
               <ItemTitle>Name: {userInput.name}</ItemTitle>
-              <ItemTitle>
-                Newsletter:{" "}
-                {userInput.newsletterType === "Both"
-                  ? "Influencer & Press (Both)"
-                  : userInput.newsletterType}
-              </ItemTitle>
               <ItemTitle>
                 {" "}
                 Submitted At:{" "}
@@ -77,22 +71,20 @@ export default function FullyBookedSingleMode({
                 (PH time)
               </ItemTitle>
 
-              {userInput.entries?.map((entry: any, index: number) => (
-                <ItemDescription key={index} className="flex flex-col mt-2">
-                  <span>Product Name: {entry.productName}</span>
-                  <span>Placement: {entry.placementType}</span>
-                  <span>
-                    Scheduled:{" "}
-                    {new Date(entry.date).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
-                  </span>
-                  <span>Segment: {entry.segment}</span>
-                  <span>Purchase Type: {entry.purchaseType}</span>
-                </ItemDescription>
-              ))}
+              <ItemDescription className="flex flex-col mt-2">
+                <span>Product Name: {entry.productName}</span>
+                <span>Ad Type: {entry.adType}</span>
+                <span>Social Post Type: {entry.socialPostType}</span>
+                <span>Platform: {entry.platform}</span>
+                <span>
+                  Scheduled:{" "}
+                  {new Date(entry.date).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}
+                </span>
+              </ItemDescription>
             </ItemContent>
           </Item>
         </div>
@@ -111,25 +103,21 @@ export default function FullyBookedSingleMode({
         ) : (
           <div className="grid gap-4">
             {existingBookings.map((booking: any) => (
-              <Item variant="muted" key={booking.row_number}>
+              <Item variant={"muted"} key={booking.row_number}>
                 <ItemMedia variant="icon">
                   <BookmarkCheck />
                 </ItemMedia>
+
                 <ItemContent>
                   <ItemTitle>Booked By: {booking.point_person}</ItemTitle>
-                  {userInput.newsletterType === "Both" && (
-                    <ItemTitle>Newsletter: {booking.newsletter_type}</ItemTitle>
-                  )}
-                  <ItemTitle>
-                    Submitted At: {booking.submitted_at} (PH time)
-                  </ItemTitle>
+                  <ItemTitle>Submitted At: {booking.submitted_at}</ItemTitle>
 
                   <ItemDescription className="flex flex-col mt-2">
                     <span>Product Name: {booking.product_name}</span>
-                    <span>Placement: {booking.newsletter_placement}</span>
-                    <span>Scheduled: {booking.date_schedule}</span>
-                    <span>Segment: {booking.segment}</span>
-                    <span>Purchase Type: {booking.purchase_type}</span>
+                    <span>Ad Type: {booking.ad_type}</span>
+                    <span>Social Post Type: {booking.social_post_type}</span>
+                    <span>Platform: {booking.platform}</span>
+                    <span>Scheduled: {booking.date_scheduled}</span>
                   </ItemDescription>
                 </ItemContent>
               </Item>
@@ -139,7 +127,7 @@ export default function FullyBookedSingleMode({
       </div>
 
       {/* INFORMATION SECTION */}
-      <NewsletterFullyBookedMsg />
+      <SocialFullyBookedMsg />
     </React.Fragment>
   );
 }

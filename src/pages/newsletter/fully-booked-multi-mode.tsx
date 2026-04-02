@@ -1,7 +1,10 @@
-// icons
+// REACT
+import React from "react";
+
+// ICONS
 import { BookmarkX, CalendarX2, BookmarkCheck } from "lucide-react";
 
-// shadcn components
+// SHADCN COMPONENTS
 import {
   Item,
   ItemContent,
@@ -9,9 +12,11 @@ import {
   ItemMedia,
   ItemTitle,
 } from "../../components/ui/item";
-import React from "react";
+
+// COMPONENT
 import NewsletterFullyBookedMsg from "./newsletter-fully-booked-msg";
 
+// TYPE PROPS
 interface FullyBookedMultiModeProps {
   message: string;
   existingBookings: any[];
@@ -25,14 +30,15 @@ export default function FullyBookedMultiMode({
 }: FullyBookedMultiModeProps) {
   return (
     <React.Fragment>
-      {/* header */}
+      {/* HEADER */}
       <div className="flex flex-col gap-2 items-center justify-center text-center">
         <CalendarX2 size={28} className="text-destructive" />
         <p className="font-bold text-2xl">Fully Booked</p>
 
         <p className="text-foreground max-w-xl">{message}</p>
       </div>
-      {/* user submission data */}
+
+      {/* USER SUBMISSION DATA */}
       {userInput && (
         <div className="mt-10">
           <h2 className="font-semibold text-lg mb-3">
@@ -82,7 +88,8 @@ export default function FullyBookedMultiMode({
           </Item>
         </div>
       )}
-      {/* existing bookings */}
+
+      {/* EXISTING BOOKINGS */}
       <div className="mt-10">
         <h2 className="font-semibold text-lg mb-3">
           Existing Bookings ({existingBookings.length})
@@ -119,7 +126,8 @@ export default function FullyBookedMultiMode({
           </div>
         )}
       </div>
-      {/* information section */}
+
+      {/* INFORMATION SECTION */}
       <NewsletterFullyBookedMsg />
     </React.Fragment>
   );

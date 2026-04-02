@@ -1,12 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { MoveLeft } from "lucide-react";
-
-import { Button } from "../../components/ui/button";
+import { Button } from "../../components/ui/button"; // SHADCN COMPONENT
+import { useNavigate } from "react-router-dom"; // REACT ROUTER DOM
+import { MoveLeft } from "lucide-react"; // ICONS
 export default function ErrorPage() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center">
-      {/* back to home */}
+      {/* BACK TO HOME */}
       <Button
         variant={"ghost"}
         onClick={() => navigate("/")}

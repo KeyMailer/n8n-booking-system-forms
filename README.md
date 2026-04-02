@@ -1,6 +1,6 @@
-# BOOKING FORM
+# KM - n8n Webhooks
 
-Webhook form for the n8n booking system.
+Webhooks for the n8n automation.
 
 ![alt text](image.png)
 

@@ -1,10 +1,11 @@
-// react-router-dom
+// REACT-ROUTER-DOM
 import { useNavigate } from "react-router-dom";
 
-// tool type format
+// TOOL TYPE FORMAT
 import type { Tool } from "../lib/tools-data";
 
-// shadcn component
+// SHADCN COMPONENT
+import { Button } from "./ui/button";
 import {
   Item,
   ItemActions,
@@ -12,9 +13,13 @@ import {
   ItemDescription,
   ItemTitle,
 } from "./ui/item";
-import { Button } from "./ui/button";
 
-export default function ItemTools({ name, description, path }: Tool) {
+export default function ItemTools({
+  name,
+  description,
+  path,
+  available,
+}: Tool) {
   const navigate = useNavigate();
   return (
     <Item variant="outline">
@@ -28,8 +33,9 @@ export default function ItemTools({ name, description, path }: Tool) {
           size="sm"
           onClick={() => navigate(path)}
           className="cursor-pointer"
+          disabled={!available}
         >
-          Book Now
+          {available ? "Book Now" : "TBA"}
         </Button>
       </ItemActions>
     </Item>

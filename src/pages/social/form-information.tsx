@@ -1,6 +1,7 @@
-import React from "react"; // REACT
+// REACT
+import React from "react";
 
-// SHADCN COMPONENT
+// SHADCN COMPONENTS
 import {
   Item,
   ItemContent,
@@ -8,7 +9,7 @@ import {
   ItemTitle,
 } from "../../components/ui/item";
 
-// ICON
+// ICONS
 import { Info } from "lucide-react";
 
 export default function FormInformation() {
@@ -22,26 +23,11 @@ export default function FormInformation() {
           <Info />
         </ItemMedia>
         <ItemContent>
-          <ItemTitle className="text-xs">
-            We accept a maximum of 13 bookings per newsletter / day. Please plan
-            your placements accordingly.
-          </ItemTitle>
-        </ItemContent>
-      </Item>
-
-      <Item
-        variant="muted"
-        className="bg-[#E0F2FE] dark:bg-[#1E3A8A] dark:text-white mb-2"
-      >
-        <ItemMedia variant="icon">
-          <Info />
-        </ItemMedia>
-        <ItemContent>
           <ItemTitle className="text-xs line-clamp-0 items-center">
-            Before you book a newsletter, please make sure to check the
-            availability in this{" "}
+            Before you book a social, please make sure to check the availability
+            in this{" "}
             <a
-              href="https://docs.google.com/spreadsheets/d/1DnlRKLkrYxVK5uNoF7I9DpkQf0hIz_Aec3E3CDdNvVU/edit?gid=450992887#gid=450992887"
+              href="https://docs.google.com/spreadsheets/d/1d2OFRNY6hNo_xvgCsnDQiNJJButSuVLlgzdOA8r3Psg/edit?gid=0#gid=0"
               target="_blank"
               rel="noopener noreferrer"
               className="text-red-500 dark:text-yellow-500"

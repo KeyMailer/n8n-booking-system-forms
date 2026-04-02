@@ -10,7 +10,7 @@ export const ORG_LINK_PREFIX = "https://madmin.keymailer.co/publishers/";
 export const PRODUCT_LINK_PREFIX =
   "https://madmin.keymailer.co/catalogue/products/";
 
-// purchase type
+// PURCHASE TYPE - DROPDOWN
 export const PURCHASE_OPTIONS = [
   "Single Shop Purchase",
   "Bundle",
@@ -24,9 +24,10 @@ export const PURCHASE_OPTIONS = [
   "Publishing Client",
   "Campaign",
   "Sales",
+  "Free Press",
 ];
 
-// segment
+// SEGMENT - DROPDOWN
 export const CUSTOMER_TYPES = [
   "Indie",
   "Studio",
@@ -34,7 +35,7 @@ export const CUSTOMER_TYPES = [
   "Enterprise/Quote-only",
 ];
 
-// placement
+// PLACEMENT - DROPDOWN
 export const PLACEMENT_TYPES = [
   "Featured",
   "Featured Demo",
@@ -42,5 +43,5 @@ export const PLACEMENT_TYPES = [
   "Standard",
 ];
 
-// newsletter type
+// NEWSLETTER TYPE - DROPDOWN
 export const NEWSLETTER_TYPE = ["Influencer", "Press", "Both"];

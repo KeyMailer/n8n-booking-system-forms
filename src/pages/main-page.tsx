@@ -1,6 +1,8 @@
-import ItemTools from "../components/item-tools";
-
+// DATA SHOW IN MAIN PAGE
 import { tools } from "../lib/tools-data";
+
+// COMPONENTS
+import ItemTools from "../components/item-tools";
 
 export default function MainPage() {
   return (
@@ -11,6 +13,7 @@ export default function MainPage() {
           name={tool.name}
           description={tool.description}
           path={tool.path}
+          available={tool.available}
         />
       ))}
     </div>

@@ -2,7 +2,7 @@ import InformationContainer from "./information-container";
 import BackHome from "@/components/back-home";
 import FormContainer from "./form-container";
 
-export default function MainNewsletterPage() {
+export default function MainSocialPage() {
   return (
     <div className="px-5 mx-auto 2xl:max-w-7xl">
       {/* BACK TO HOME */}
@@ -13,7 +13,7 @@ export default function MainNewsletterPage() {
         {/* FORM CONTAINER (LEFT) */}
         <FormContainer />
 
-        {/* INFO CONTAINER (RIGHT) */}
+        {/* NOTES CONTAINER (RIGHT) */}
         <InformationContainer />
       </div>
     </div>

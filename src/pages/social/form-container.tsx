@@ -12,10 +12,10 @@ import { LoaderCircle } from "lucide-react"; // ICON
 import { format } from "date-fns"; // FOR CALENDAR
 import axios from "axios"; // FOR HTTP REQUEST
 
-// SHADCN COMPONENT
+// SHADCN COMPONENTS
 import { Field, FieldLabel, FieldSet } from "../../components/ui/field";
-import { Textarea } from "../../components/ui/textarea";
 import { Calendar } from "../../components/ui/calendar";
+import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
@@ -39,20 +39,18 @@ import FieldError from "@/components/field-error";
 import FormInformation from "./form-information";
 
 // HELPER FUNCTION
-import { countWords } from "../../lib/helper/text-helper";
-import { getDisabledDays } from "./utils/getDisabledDays";
+import { countWords } from "@/lib/helper/text-helper";
 
 // CONSTANT DATA
 import {
-  NEWSLETTER_SHOWS_MODE,
   MAX_SUBMISSIONS,
   NOTES_MAX_WORDS,
+  SOCIAL_POST_TYPE,
+  AD_TYPE,
+  PLATFORM,
   ORG_LINK_PREFIX,
   PRODUCT_LINK_PREFIX,
-  PURCHASE_OPTIONS,
-  CUSTOMER_TYPES,
-  PLACEMENT_TYPES,
-  NEWSLETTER_TYPE,
+  GOOGLE_DRIVE_PREFIX,
 } from "./constants";
 
 // ======== TYPES SECTION ========
@@ -61,34 +59,34 @@ type SubmissionMode = "single" | "multiple";
 
 interface SubmissionEntry {
   id: number;
-  date: Date | undefined;
   productName: string;
-  placementType: string;
   organizationLink: string;
   productLink: string;
-  segment: string;
-  purchaseType: string;
+  assetLink: string;
+  socialPostType: string;
+  adType: string;
+  platform: string;
+  date: Date | undefined;
   notes: string;
 }
 
 type EntryErrors = Partial<Record<keyof SubmissionEntry, string>>;
-
 type FormErrors = {
   name?: string;
-  newsletterType?: string;
-  entries: Record<number, EntryErrors>; // keyed by entry.id
+  entries: Record<number, EntryErrors>;
 };
 
 function createEmptyEntry(id: number): SubmissionEntry {
   return {
     id,
-    date: undefined,
     productName: "",
-    placementType: "",
     organizationLink: "",
     productLink: "",
-    segment: "",
-    purchaseType: "",
+    assetLink: "",
+    socialPostType: "",
+    adType: "",
+    platform: "",
+    date: undefined,
     notes: "",
   };
 }
@@ -100,9 +98,6 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
 
   if (!entry.productName.trim())
     errors.productName = "Product name is required.";
-  if (!entry.placementType)
-    errors.placementType = "Placement type is required.";
-  if (!entry.date) errors.date = "Date scheduled is required.";
 
   if (!entry.organizationLink.trim()) {
     errors.organizationLink = "Organization link is required.";
@@ -116,8 +111,17 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
     errors.productLink = `Must start with ${PRODUCT_LINK_PREFIX}`;
   }
 
-  if (!entry.segment) errors.segment = "Segment is required.";
-  if (!entry.purchaseType) errors.purchaseType = "Purchase type is required.";
+  if (!entry.assetLink.trim()) {
+    errors.assetLink = "Asset link is required.";
+  } else if (!entry.assetLink.startsWith(GOOGLE_DRIVE_PREFIX)) {
+    errors.assetLink = `Must start with ${GOOGLE_DRIVE_PREFIX}`;
+  }
+
+  if (!entry.socialPostType)
+    errors.socialPostType = "Social post type is required.";
+  if (!entry.adType) errors.adType = "Ad type is required.";
+  if (!entry.platform) errors.platform = "Platform is required.";
+  if (!entry.date) errors.date = "Date scheduled is required.";
 
   if (entry.notes.trim() && countWords(entry.notes) > NOTES_MAX_WORDS) {
     errors.notes = `Notes must not exceed ${NOTES_MAX_WORDS} words (currently ${countWords(entry.notes)}).`;
@@ -126,15 +130,10 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
   return errors;
 }
 
-function validateForm(
-  name: string,
-  newsletterType: string,
-  entries: SubmissionEntry[],
-): FormErrors {
+function validateForm(name: string, entries: SubmissionEntry[]): FormErrors {
   const errors: FormErrors = { entries: {} };
 
   if (!name.trim()) errors.name = "Name is required.";
-  if (!newsletterType) errors.newsletterType = "Newsletter type is required.";
 
   for (const entry of entries) {
     const entryErrors = validateEntry(entry);
@@ -147,42 +146,43 @@ function validateForm(
 }
 
 function hasErrors(errors: FormErrors): boolean {
-  if (errors.name || errors.newsletterType) return true;
+  if (errors.name) return true;
   return Object.keys(errors.entries).length > 0;
 }
 
-// ======== SUB COMPONENTS ========
+// ======== SUB-COMPONENTS ========
 
 interface SubmissionBlockProps {
   index: number;
   entry: SubmissionEntry;
-  showIndex: boolean;
+  isMultiple: boolean;
   canRemove: boolean;
   errors: EntryErrors;
   isLoading: boolean;
   onChange: (id: number, field: keyof SubmissionEntry, value: unknown) => void;
   onRemove: (id: number) => void;
-  newsletterType: string;
 }
 
 function SubmissionBlock({
   index,
   entry,
-  showIndex,
+  isMultiple,
   canRemove,
   errors,
   isLoading,
   onChange,
   onRemove,
-  newsletterType,
 }: SubmissionBlockProps) {
   const wordCount = countWords(entry.notes);
+  const today = new Date();
+  const isSameDayAllowed =
+    entry.adType === "Bronze" && entry.socialPostType === "Image";
 
   return (
     <div
-      className={`space-y-4 relative ${showIndex ? "border rounded-lg p-5" : ""}`}
+      className={`space-y-4 relative ${isMultiple ? "border rounded-lg p-5" : ""}`}
     >
-      {showIndex && (
+      {isMultiple && (
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-muted-foreground">
             #{index + 1}
@@ -216,60 +216,6 @@ function SubmissionBlock({
         <FieldError message={errors.productName} />
       </Field>
 
-      {/* PLACEMENT TYPE */}
-      <Field>
-        <FieldLabel>Placement Type</FieldLabel>
-        <Select
-          value={entry.placementType}
-          onValueChange={(val) => onChange(entry.id, "placementType", val)}
-          disabled={isLoading}
-        >
-          <SelectTrigger
-            className={errors.placementType ? "border-destructive" : ""}
-          >
-            <SelectValue placeholder="Select a placement type" />
-          </SelectTrigger>
-          <SelectContent>
-            {PLACEMENT_TYPES.map((type) => (
-              <SelectItem key={type} value={type}>
-                {type}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FieldError message={errors.placementType} />
-      </Field>
-
-      {/* DATE SCHEDULED */}
-      <Field>
-        <FieldLabel>Date Scheduled</FieldLabel>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`justify-start font-normal ${errors.date ? "border-destructive!" : ""}`}
-              disabled={isLoading}
-            >
-              {entry.date ? (
-                format(entry.date, "PPP")
-              ) : (
-                <span>Select a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={entry.date}
-              onSelect={(d) => onChange(entry.id, "date", d)}
-              defaultMonth={entry.date}
-              disabled={getDisabledDays(newsletterType)}
-            />
-          </PopoverContent>
-        </Popover>
-        <FieldError message={errors.date} />
-      </Field>
-
       {/* ORGANIZATION LINK */}
       <Field>
         <FieldLabel>Organization Link</FieldLabel>
@@ -300,50 +246,122 @@ function SubmissionBlock({
         <FieldError message={errors.productLink} />
       </Field>
 
-      {/* SEGMENT */}
+      {/* ASSET LINK */}
       <Field>
-        <FieldLabel>Segment</FieldLabel>
+        <FieldLabel>Asset Folder</FieldLabel>
+        <Input
+          type="text"
+          placeholder="Enter google drive asset link"
+          value={entry.assetLink}
+          onChange={(e) => onChange(entry.id, "assetLink", e.target.value)}
+          disabled={isLoading}
+          className={errors.assetLink ? "border-destructive" : ""}
+        />
+        <FieldError message={errors.assetLink} />
+      </Field>
+
+      {/* SOCIAL POST TYPE */}
+      <Field>
+        <FieldLabel>Social Post Type</FieldLabel>
         <Select
-          value={entry.segment}
-          onValueChange={(val) => onChange(entry.id, "segment", val)}
+          value={entry.socialPostType}
+          onValueChange={(val) => onChange(entry.id, "socialPostType", val)}
           disabled={isLoading}
         >
-          <SelectTrigger className={errors.segment ? "border-destructive" : ""}>
-            <SelectValue placeholder="Select a segment" />
+          <SelectTrigger
+            className={errors.socialPostType ? "border-destructive" : ""}
+          >
+            <SelectValue placeholder="Select a social post type" />
           </SelectTrigger>
           <SelectContent>
-            {CUSTOMER_TYPES.map((type) => (
+            {SOCIAL_POST_TYPE.map((type) => (
               <SelectItem key={type} value={type}>
                 {type}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <FieldError message={errors.segment} />
+        <FieldError message={errors.socialPostType} />
       </Field>
 
-      {/* PURCHASE TYPE */}
+      {/* AD TYPE */}
       <Field>
-        <FieldLabel>Purchase Type</FieldLabel>
+        <FieldLabel>Ad Type</FieldLabel>
         <Select
-          value={entry.purchaseType}
-          onValueChange={(val) => onChange(entry.id, "purchaseType", val)}
+          value={entry.adType}
+          onValueChange={(val) => onChange(entry.id, "adType", val)}
           disabled={isLoading}
         >
-          <SelectTrigger
-            className={errors.purchaseType ? "border-destructive" : ""}
-          >
-            <SelectValue placeholder="Select a purchase type" />
+          <SelectTrigger className={errors.adType ? "border-destructive" : ""}>
+            <SelectValue placeholder="Select an ad type" />
           </SelectTrigger>
           <SelectContent>
-            {PURCHASE_OPTIONS.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
+            {AD_TYPE.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <FieldError message={errors.purchaseType} />
+        <FieldError message={errors.adType} />
+      </Field>
+
+      {/* DATE SCHEDULED */}
+      <Field>
+        <FieldLabel>Date Scheduled</FieldLabel>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`justify-start font-normal ${errors.date ? "border-destructive!" : ""}`}
+              disabled={isLoading}
+            >
+              {entry.date ? (
+                format(entry.date, "PPP")
+              ) : (
+                <span>Select a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={entry.date}
+              onSelect={(d) => onChange(entry.id, "date", d)}
+              defaultMonth={entry.date}
+              disabled={
+                isSameDayAllowed
+                  ? [{ before: today }]
+                  : [{ before: today }, today]
+              }
+            />
+          </PopoverContent>
+        </Popover>
+        <FieldError message={errors.date} />
+      </Field>
+
+      {/* PLATFORM */}
+      <Field>
+        <FieldLabel>Platform</FieldLabel>
+        <Select
+          value={entry.platform}
+          onValueChange={(val) => onChange(entry.id, "platform", val)}
+          disabled={isLoading}
+        >
+          <SelectTrigger
+            className={errors.platform ? "border-destructive" : ""}
+          >
+            <SelectValue placeholder="Select a platform" />
+          </SelectTrigger>
+          <SelectContent>
+            {PLATFORM.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FieldError message={errors.platform} />
       </Field>
 
       {/* NOTES */}
@@ -384,7 +402,6 @@ function SubmissionBlock({
 export default function FormContainer() {
   // STATES
   const [name, setName] = useState("");
-  const [newsletterType, setNewsletterType] = useState("");
   const [submissionMode, setSubmissionMode] =
     useState<SubmissionMode>("single");
   const [entries, setEntries] = useState<SubmissionEntry[]>([
@@ -396,25 +413,10 @@ export default function FormContainer() {
   const [isLoading, setIsLoading] = useState(false);
 
   const nextId = React.useRef(2);
-
-  const showModeToggle = NEWSLETTER_SHOWS_MODE.includes(newsletterType);
   const isMultiple = submissionMode === "multiple";
   const canAddMore = entries.length < MAX_SUBMISSIONS;
 
   const navigate = useNavigate();
-
-  function handleNewsletterTypeChange(val: string) {
-    setNewsletterType(val);
-    if (!NEWSLETTER_SHOWS_MODE.includes(val)) {
-      setSubmissionMode("single");
-      setEntries([createEmptyEntry(1)]);
-      nextId.current = 2;
-    } else {
-      // only clear dates if staying in mode-toggle flow
-      setEntries((prev) => prev.map((e) => ({ ...e, date: undefined })));
-    }
-    setErrors((prev) => ({ ...prev, newsletterType: undefined }));
-  }
 
   function handleModeChange(mode: SubmissionMode) {
     setSubmissionMode(mode);
@@ -429,9 +431,36 @@ export default function FormContainer() {
     value: unknown,
   ) {
     setEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
+      prev.map((e) => {
+        if (e.id !== id) return e;
+
+        const updated = { ...e, [field]: value };
+
+        // If adType or socialPostType changed, check if selected date (today) is still valid
+        if (field === "adType" || field === "socialPostType") {
+          const isSameDayAllowed =
+            updated.adType === "Bronze" && updated.socialPostType === "Image";
+
+          const isToday =
+            updated.date &&
+            updated.date.toDateString() === new Date().toDateString();
+
+          if (!isSameDayAllowed && isToday) {
+            updated.date = undefined; // clear the date
+            toast.warning(
+              "Same day booking is only allowed for Bronze & Image.",
+              {
+                position: "top-right",
+              },
+            );
+          }
+        }
+
+        return updated;
+      }),
     );
-    // clear field-level error on change
+
+    // clear field error as before
     setErrors((prev) => {
       const entryErrors = { ...(prev.entries[id] ?? {}) };
       delete entryErrors[field as keyof EntryErrors];
@@ -458,7 +487,7 @@ export default function FormContainer() {
 
   // SUBMIT DATA TO N8N
   async function handleSubmit() {
-    const validationErrors = validateForm(name, newsletterType, entries);
+    const validationErrors = validateForm(name, entries);
     setErrors(validationErrors);
     if (hasErrors(validationErrors)) return;
 
@@ -466,7 +495,6 @@ export default function FormContainer() {
     try {
       const payload = {
         name,
-        newsletterType,
         submissionMode,
         entries: entries.map((e) => ({
           ...e,
@@ -475,17 +503,17 @@ export default function FormContainer() {
         submittedAt: new Date().toISOString(),
       };
 
-      const response = await axios.post(URLS.NEWSLETTER, payload, {
+      const response = await axios.post(URLS.SOCIAL, payload, {
         timeout: 60000,
       });
 
       // HANDLE 207 - PARTIALLY BOOKED
       if (response.status === 207) {
         sessionStorage.setItem(
-          "partiallyBookedData",
+          "socialPartiallyBookedData",
           JSON.stringify(response.data[0]),
         );
-        navigate("/newsletter-booking/partially-booked");
+        navigate("/social-booking/partially-booked");
         return;
       }
 
@@ -504,7 +532,6 @@ export default function FormContainer() {
 
       // RESET FORM
       setName("");
-      setNewsletterType("");
       setSubmissionMode("single");
       setEntries([createEmptyEntry(1)]);
       nextId.current = 2;
@@ -519,11 +546,13 @@ export default function FormContainer() {
 
         // HANDLE 409 - FULLY BOOKED
         if (status === 409) {
-          sessionStorage.setItem("fullyBookedData", JSON.stringify(data[0]));
-          navigate("/newsletter-booking/fully-booked");
+          sessionStorage.setItem(
+            "socialFullyBookedData",
+            JSON.stringify(data[0]),
+          );
+          navigate("/social-booking/fully-booked");
           return;
         }
-
         // HANDLE 503 - APPS SCRIPT
         if (status === 503) {
           toast.error(message || "Something went wrong. Please try again.", {
@@ -557,9 +586,9 @@ export default function FormContainer() {
 
       {/* INTRODUCTION */}
       <div className="my-5">
-        <h1 className="text-2xl font-semibold">Newsletter Booking Details</h1>
+        <h1 className="text-2xl font-semibold">Social Booking Details</h1>
         <p className="text-sm text-muted-foreground">
-          Book multiple newsletter placements in one go.
+          Book multiple social placements in one go.
         </p>
       </div>
 
@@ -583,61 +612,31 @@ export default function FormContainer() {
           )}
         </Field>
 
-        {/* NEWSLETTER TYPE */}
+        {/* MODE TOGGLE - ALWAYS VISIBLE */}
         <Field>
-          <FieldLabel>Newsletter Type</FieldLabel>
-          <Select
-            value={newsletterType}
-            onValueChange={handleNewsletterTypeChange}
-            disabled={isLoading}
-          >
-            <SelectTrigger
-              className={errors.newsletterType ? "border-destructive" : ""}
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={!isMultiple ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeChange("single")}
+              className="flex-1"
+              disabled={isLoading}
             >
-              <SelectValue placeholder="Select a newsletter type" />
-            </SelectTrigger>
-            <SelectContent>
-              {NEWSLETTER_TYPE.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.newsletterType && (
-            <p className="text-xs text-destructive mt-1">
-              {errors.newsletterType}
-            </p>
-          )}
+              Single
+            </Button>
+            <Button
+              type="button"
+              variant={isMultiple ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeChange("multiple")}
+              className="flex-1"
+              disabled={isLoading}
+            >
+              Multiple
+            </Button>
+          </div>
         </Field>
-
-        {/* MODE TOGGLE (SINGLE/MULTIPLE SUBMISSION) */}
-        {showModeToggle && (
-          <Field>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={!isMultiple ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleModeChange("single")}
-                className="flex-1"
-                disabled={isLoading}
-              >
-                Single
-              </Button>
-              <Button
-                type="button"
-                variant={isMultiple ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleModeChange("multiple")}
-                className="flex-1"
-                disabled={isLoading}
-              >
-                Multiple
-              </Button>
-            </div>
-          </Field>
-        )}
 
         {/* ENTRIES */}
         <div className="space-y-6">
@@ -646,18 +645,17 @@ export default function FormContainer() {
               key={entry.id}
               index={index}
               entry={entry}
-              showIndex={isMultiple}
+              isMultiple={isMultiple}
               canRemove={isMultiple && entries.length > 1}
               errors={errors.entries[entry.id] ?? {}}
               isLoading={isLoading}
               onChange={handleEntryChange}
               onRemove={handleRemoveEntry}
-              newsletterType={newsletterType}
             />
           ))}
         </div>
 
-        {/* ADD ANOTHER SUBMISSION (MULTIPLE)*/}
+        {/* ADD ANOTHER SUBMISSION (MULTIPLE) */}
         {isMultiple && canAddMore && (
           <Button
             type="button"
@@ -680,9 +678,9 @@ export default function FormContainer() {
         )}
 
         {/* SUBMIT TO N8N */}
-        <Button
+        {/* <Button
           variant="default"
-          className={`cursor-pointer py-5 bg-[#EE3167] text-white`}
+          className="cursor-pointer py-5 bg-[#EE3167] text-white"
           type="button"
           onClick={handleSubmit}
           disabled={isLoading}
@@ -693,14 +691,44 @@ export default function FormContainer() {
               <LoaderCircle className="animate-spin" />
             </div>
           ) : (
-            "Book Newsletter"
+            "Book Social"
           )}
-        </Button>
+        </Button> */}
+        {/* SUBMIT TO N8N */}
+        {(() => {
+          const phHour = new Date(
+            new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }),
+          ).getHours();
+          const isOutsideAllowedHours = phHour >= 20; // Disable from 8PM (20:00) to midnight
+          const isDisabled = isLoading || isOutsideAllowedHours;
 
-        <WarningMessage
-          message=" Once submitted, you cannot edit your booking. Please review your
-                      selections carefully before submitting."
-        />
+          return (
+            <Button
+              variant="default"
+              className={`py-5 text-white ${
+                isDisabled
+                  ? "bg-[#EE3167]/90 cursor-not-allowed"
+                  : "bg-[#EE3167] cursor-pointer"
+              }`}
+              type="button"
+              onClick={handleSubmit}
+              disabled={isDisabled}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2 cursor-not-allowed">
+                  <span>Loading</span>
+                  <LoaderCircle className="animate-spin" />
+                </div>
+              ) : isOutsideAllowedHours ? (
+                "Booking Unavailable (8PM–12AM)"
+              ) : (
+                "Book Social"
+              )}
+            </Button>
+          );
+        })()}
+
+        <WarningMessage message="Once submitted, you cannot edit your booking. Please review your selections carefully before submitting." />
       </FieldSet>
     </div>
   );

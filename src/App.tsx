@@ -1,13 +1,13 @@
-// react-router-dom
+// REACT-ROUTER-DOM
 import { RouterProvider } from "react-router-dom";
 
-// light-dark mode context
+// LIGHT-DARK MODE CONTEXT
 import { ThemeProvider } from "./context/theme-context";
 
-// routes paths
+// ROUTES PATHS
 import router from "./routes/main-route";
 
-// shadcn
+// SHADCN COMPONENTS
 import { Toaster } from "./components/ui/sonner";
 
 export default function App() {

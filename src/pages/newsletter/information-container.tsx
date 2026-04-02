@@ -8,6 +8,7 @@ import {
 export default function InformationContainer() {
   return (
     <div className="w-full lg:w-1/4 lg:sticky lg:top-5 h-fit ml-auto">
+      {/* QUICK NOTE */}
       <Item variant={"muted"}>
         <ItemContent>
           <ItemTitle>Quick Note</ItemTitle>
@@ -17,7 +18,8 @@ export default function InformationContainer() {
           </ItemDescription>
         </ItemContent>
       </Item>
-      {/* influencer */}
+
+      {/* INFLUENCER */}
       <Item className="my-2" variant={"muted"}>
         <ItemContent>
           <ItemTitle>Influencer Newsletter</ItemTitle>
@@ -49,7 +51,7 @@ export default function InformationContainer() {
         </ItemContent>
       </Item>
 
-      {/* press */}
+      {/* PRESS */}
       <Item variant={"muted"}>
         <ItemContent>
           <ItemTitle>Press Newsletter</ItemTitle>
