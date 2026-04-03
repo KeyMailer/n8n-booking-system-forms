@@ -1,0 +1,39 @@
+name: Deploy n8n Booking Forms
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-n8n-booking-forms
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, n8n-booking-forms]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg VITE_N8N_API_NEWSLETTER_URL_PROD=${{ vars.VITE_N8N_API_NEWSLETTER_URL_PROD }} \
+            --build-arg VITE_N8N_API_NEWSLETTER_URL_LOCAL=${{ vars.VITE_N8N_API_NEWSLETTER_URL_LOCAL }} \
+            --build-arg VITE_N8N_API_SOCIAL_URL_PROD=${{ vars.VITE_N8N_API_SOCIAL_URL_PROD }} \
+            --build-arg VITE_N8N_API_SOCIAL_URL_LOCAL=${{ vars.VITE_N8N_API_SOCIAL_URL_LOCAL }} \
+            -t n8n-booking-forms:latest .
+
+      - name: Deploy container
+        run: |
+          docker stop n8n-booking-forms || true
+          docker rm n8n-booking-forms || true
+          docker run -d \
+            --name n8n-booking-forms \
+            -p 8091:80 \
+            --restart unless-stopped \
+            n8n-booking-forms:latest
+
+      - name: Clean up old images
+        run: docker image prune -f
