@@ -1,26 +1,19 @@
 FROM node:22-alpine AS builder
-
 WORKDIR /app
-
 COPY package.json package-lock.json ./
 RUN npm ci && npm install --save-dev @types/node
-
 COPY . .
-
 ARG VITE_N8N_API_NEWSLETTER_URL_PROD
 ARG VITE_N8N_API_NEWSLETTER_URL_LOCAL
-
+ARG VITE_N8N_API_SOCIAL_URL_PROD
+ARG VITE_N8N_API_SOCIAL_URL_LOCAL
 ENV VITE_N8N_API_NEWSLETTER_URL_PROD=$VITE_N8N_API_NEWSLETTER_URL_PROD
 ENV VITE_N8N_API_NEWSLETTER_URL_LOCAL=$VITE_N8N_API_NEWSLETTER_URL_LOCAL
-
+ENV VITE_N8N_API_SOCIAL_URL_PROD=$VITE_N8N_API_SOCIAL_URL_PROD
+ENV VITE_N8N_API_SOCIAL_URL_LOCAL=$VITE_N8N_API_SOCIAL_URL_LOCAL
 RUN npm run build
-
 FROM nginx:alpine
-
 COPY --from=builder /app/dist /usr/share/nginx/html
-
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
