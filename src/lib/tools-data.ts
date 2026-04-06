@@ -18,6 +18,6 @@ export const tools: Tool[] = [
     name: "Social Booking",
     description: "Book multiple social placements in one go.",
     path: "/social-booking",
-    available: true,
+    available: false,
   },
 ];
