@@ -678,23 +678,6 @@ export default function FormContainer() {
         )}
 
         {/* SUBMIT TO N8N */}
-        {/* <Button
-          variant="default"
-          className="cursor-pointer py-5 bg-[#EE3167] text-white"
-          type="button"
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <div className="flex items-center gap-2 cursor-not-allowed">
-              <span>Loading</span>
-              <LoaderCircle className="animate-spin" />
-            </div>
-          ) : (
-            "Book Social"
-          )}
-        </Button> */}
-        {/* SUBMIT TO N8N */}
         {(() => {
           const phHour = new Date(
             new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }),
@@ -720,7 +703,7 @@ export default function FormContainer() {
                   <LoaderCircle className="animate-spin" />
                 </div>
               ) : isOutsideAllowedHours ? (
-                "Booking Unavailable (8PM–12AM)"
+                "Booking Unavailable (8PM–12AM) PHT"
               ) : (
                 "Book Social"
               )}

@@ -113,12 +113,13 @@ export default function InformationContainer() {
             • No limit for Bronze ad type, but there is a maximum of 2 bookings
             per day for Silver to Platinum ad types.
           </ItemDescription>
-          <ItemDescription className="my-2">
-            • Bookings are not allowed from 8:00 PM to 12:00 AM PHT onwards.
-          </ItemDescription>
+
           <ItemDescription className="line-clamp-3">
             • Same day booking is not allowed, except for Bronze ads and image
             post type.
+          </ItemDescription>
+          <ItemDescription className="my-2">
+            • Bookings are not allowed from 8:00 PM to 12:00 AM PHT onwards.
           </ItemDescription>
         </ItemContent>
       </Item>
