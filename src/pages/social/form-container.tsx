@@ -678,38 +678,22 @@ export default function FormContainer() {
         )}
 
         {/* SUBMIT TO N8N */}
-        {(() => {
-          const phHour = new Date(
-            new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }),
-          ).getHours();
-          const isOutsideAllowedHours = phHour >= 20; // Disable from 8PM (20:00) to midnight
-          const isDisabled = isLoading || isOutsideAllowedHours;
-
-          return (
-            <Button
-              variant="default"
-              className={`py-5 text-white ${
-                isDisabled
-                  ? "bg-[#EE3167]/90 cursor-not-allowed"
-                  : "bg-[#EE3167] cursor-pointer"
-              }`}
-              type="button"
-              onClick={handleSubmit}
-              disabled={isDisabled}
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2 cursor-not-allowed">
-                  <span>Loading</span>
-                  <LoaderCircle className="animate-spin" />
-                </div>
-              ) : isOutsideAllowedHours ? (
-                "Booking Unavailable (8PM–12AM) PHT"
-              ) : (
-                "Book Social"
-              )}
-            </Button>
-          );
-        })()}
+        <Button
+          variant="default"
+          className="cursor-pointer py-5 bg-[#EE3167] text-white"
+          type="button"
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2 cursor-not-allowed">
+              <span>Loading</span>
+              <LoaderCircle className="animate-spin" />
+            </div>
+          ) : (
+            "Book Social"
+          )}
+        </Button>
 
         <WarningMessage message="Once submitted, you cannot edit your booking. Please review your selections carefully before submitting." />
       </FieldSet>
