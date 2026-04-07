@@ -682,7 +682,7 @@ export default function FormContainer() {
           const phHour = new Date(
             new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }),
           ).getHours();
-          const isOutsideAllowedHours = phHour >= 20; // Disable from 8PM (20:00) to midnight
+          const isOutsideAllowedHours = phHour >= 20; // Disable from 8:00 PM to 12:00 AM PHT
           const isDisabled = isLoading || isOutsideAllowedHours;
 
           return (

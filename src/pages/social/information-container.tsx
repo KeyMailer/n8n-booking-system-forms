@@ -109,17 +109,22 @@ export default function InformationContainer() {
       <Item variant={"muted"}>
         <ItemContent>
           <ItemTitle>Quick Note</ItemTitle>
-          <ItemDescription className="line-clamp-5">
-            • No limit for Bronze ad type, but there is a maximum of 2 bookings
-            per day for Silver to Platinum ad types.
+          <ItemDescription className="my-2 line-clamp-5">
+            • Bronze ad types have no booking limit. Silver to Platinum ad types
+            are limited to a maximum of 5 bookings per day.
           </ItemDescription>
 
-          <ItemDescription className="line-clamp-3">
-            • Same day booking is not allowed, except for Bronze ads and image
-            post type.
+          <ItemDescription className="my-2 line-clamp-3">
+            • Same-day bookings are not allowed, except for Bronze ads and image
+            post types.
           </ItemDescription>
-          <ItemDescription className="my-2">
-            • Bookings are not allowed from 8:00 PM to 12:00 AM PHT onwards.
+          <ItemDescription className="my-2 line-clamp-3">
+            • The button will be automatically disabled from 8:00 PM to 12:00 AM
+            (PHT).
+          </ItemDescription>
+
+          <ItemDescription className="my-2 line-clamp-3">
+            • Same-day Bronze bookings must be made before 8:00 PM (PHT).
           </ItemDescription>
         </ItemContent>
       </Item>
