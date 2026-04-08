@@ -118,13 +118,11 @@ export default function InformationContainer() {
             • Same-day bookings are not allowed, except for Bronze ads and image
             post types.
           </ItemDescription>
-          <ItemDescription className="my-2 line-clamp-3">
-            • The button will be automatically disabled from 8:00 PM to 12:00 AM
-            (PHT).
-          </ItemDescription>
 
-          <ItemDescription className="my-2 line-clamp-3">
-            • Same-day Bronze bookings must be made before 8:00 PM (PHT).
+          <ItemDescription className="my-2 line-clamp-5">
+            • Same-day Bronze Image bookings are only available until 8:00 PM
+            (PHT). After 8:00 PM, the booking button will be automatically
+            disabled and will remain unavailable until 12:00 AM (PHT).
           </ItemDescription>
         </ItemContent>
       </Item>

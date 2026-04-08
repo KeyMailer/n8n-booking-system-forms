@@ -682,7 +682,15 @@ export default function FormContainer() {
           const phHour = new Date(
             new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }),
           ).getHours();
-          const isOutsideAllowedHours = phHour >= 20; // Disable from 8:00 PM to 12:00 AM PHT
+
+          // DISABLE THE BUTTON AT 8:00PM TO 12:00AM IF THE ENTRY IS BRONZE AND IMAGE
+          const hasSameDayEntry = entries.some(
+            (e) => e.adType === "Bronze" && e.socialPostType === "Image",
+          );
+
+          // DISABLE THE BUTTON FROM 8:00 PM TO 12:00 AM PHT
+          const isOutsideAllowedHours = hasSameDayEntry && phHour >= 20;
+
           const isDisabled = isLoading || isOutsideAllowedHours;
 
           return (
