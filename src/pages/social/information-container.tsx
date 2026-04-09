@@ -121,8 +121,8 @@ export default function InformationContainer() {
 
           <ItemDescription className="my-2 line-clamp-5">
             • Same-day Bronze Image bookings are only available until 8:00 PM
-            (PHT). After 8:00 PM, the booking button will be automatically
-            disabled and will remain unavailable until 12:00 AM (PHT).
+            (PHT). After 8:00 PM, the button will be automatically disabled and
+            will remain unavailable until 12:00 AM (PHT).
           </ItemDescription>
         </ItemContent>
       </Item>

@@ -1,5 +1,5 @@
 // REACT
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // REACT-ROUTER-DOM
 import { useNavigate } from "react-router-dom";
@@ -413,6 +413,25 @@ export default function FormContainer() {
   const [isLoading, setIsLoading] = useState(false);
 
   const nextId = React.useRef(2);
+
+  // RESTORE STATE ON MOUNT
+  useEffect(() => {
+    const saved = sessionStorage.getItem("socialSavedFormState");
+    if (!saved) return;
+
+    const parsed = JSON.parse(saved);
+    setName(parsed.name);
+    setSubmissionMode(parsed.submissionMode);
+    setEntries(
+      parsed.entries.map((e: SubmissionEntry & { date?: string }) => ({
+        ...e,
+        date: e.date ? new Date(e.date) : undefined,
+      })),
+    );
+
+    sessionStorage.removeItem("socialSavedFormState"); // clean up after restoring
+  }, []);
+
   const isMultiple = submissionMode === "multiple";
   const canAddMore = entries.length < MAX_SUBMISSIONS;
 
@@ -546,13 +565,27 @@ export default function FormContainer() {
 
         // HANDLE 409 - FULLY BOOKED
         if (status === 409) {
+          // SAVE FROM STATE BEFORE LEAVING
           sessionStorage.setItem(
             "socialFullyBookedData",
             JSON.stringify(data[0]),
           );
+          // 👇 Add this
+          sessionStorage.setItem(
+            "socialSavedFormState",
+            JSON.stringify({
+              name,
+              submissionMode,
+              entries: entries.map((e) => ({
+                ...e,
+                date: e.date ? e.date.toISOString() : undefined,
+              })),
+            }),
+          );
           navigate("/social-booking/fully-booked");
           return;
         }
+
         // HANDLE 503 - APPS SCRIPT
         if (status === 503) {
           toast.error(message || "Something went wrong. Please try again.", {

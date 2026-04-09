@@ -1,5 +1,5 @@
 // REACT
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // REACT-ROUTER-DOM
 import { useNavigate } from "react-router-dom";
@@ -397,6 +397,25 @@ export default function FormContainer() {
 
   const nextId = React.useRef(2);
 
+  // RESTORE STATE ON MOUNT
+  useEffect(() => {
+    const saved = sessionStorage.getItem("savedFormState");
+    if (!saved) return;
+
+    const parsed = JSON.parse(saved);
+    setName(parsed.name);
+    setNewsletterType(parsed.newsletterType);
+    setSubmissionMode(parsed.submissionMode);
+    setEntries(
+      parsed.entries.map((e: SubmissionEntry & { date?: string }) => ({
+        ...e,
+        date: e.date ? new Date(e.date) : undefined, // deserialize Date
+      })),
+    );
+
+    sessionStorage.removeItem("savedFormState"); // clean up after restoring
+  }, []);
+
   const showModeToggle = NEWSLETTER_SHOWS_MODE.includes(newsletterType);
   const isMultiple = submissionMode === "multiple";
   const canAddMore = entries.length < MAX_SUBMISSIONS;
@@ -519,7 +538,21 @@ export default function FormContainer() {
 
         // HANDLE 409 - FULLY BOOKED
         if (status === 409) {
+          // SAVE FROM STATE BEFORE LEAVING
           sessionStorage.setItem("fullyBookedData", JSON.stringify(data[0]));
+          sessionStorage.setItem(
+            "savedFormState",
+            JSON.stringify({
+              name,
+              newsletterType,
+              submissionMode,
+              entries: entries.map((e) => ({
+                ...e,
+                date: e.date ? e.date.toISOString() : undefined, // serialize Date
+              })),
+            }),
+          );
+          // NAVIGATE TO NEXT FULLY-BOOKED PAGE
           navigate("/newsletter-booking/fully-booked");
           return;
         }
