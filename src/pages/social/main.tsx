@@ -1,4 +1,5 @@
 import InformationContainer from "./information-container";
+import ScrollButton from "@/components/scroll-button";
 import BackHome from "@/components/back-home";
 import FormContainer from "./form-container";
 
@@ -16,6 +17,9 @@ export default function MainSocialPage() {
         {/* NOTES CONTAINER (RIGHT) */}
         <InformationContainer />
       </div>
+
+      {/* SCROLL UP OR DOWN */}
+      <ScrollButton />
     </div>
   );
 }

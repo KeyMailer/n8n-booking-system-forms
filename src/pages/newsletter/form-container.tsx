@@ -41,6 +41,7 @@ import FormInformation from "./form-information";
 // HELPER FUNCTION
 import { countWords } from "../../lib/helper/text-helper";
 import { getDisabledDays } from "./utils/getDisabledDays";
+import { containsUrl } from "@/lib/helper/contain-url";
 
 // CONSTANT DATA
 import {
@@ -117,7 +118,9 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
   }
 
   if (!entry.segment) errors.segment = "Segment is required.";
-  if (!entry.purchaseType) errors.purchaseType = "Purchase type is required.";
+  if (!entry.purchaseType || entry.purchaseType === "Other") {
+    errors.purchaseType = "Purchase type is required.";
+  }
 
   if (entry.notes.trim() && countWords(entry.notes) > NOTES_MAX_WORDS) {
     errors.notes = `Notes must not exceed ${NOTES_MAX_WORDS} words (currently ${countWords(entry.notes)}).`;
@@ -133,7 +136,12 @@ function validateForm(
 ): FormErrors {
   const errors: FormErrors = { entries: {} };
 
-  if (!name.trim()) errors.name = "Name is required.";
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+    errors.name = "Name is required.";
+  } else if (containsUrl(trimmedName)) {
+    errors.name = "Name cannot contain links or URLs.";
+  }
   if (!newsletterType) errors.newsletterType = "Newsletter type is required.";
 
   for (const entry of entries) {
@@ -326,8 +334,20 @@ function SubmissionBlock({
       <Field>
         <FieldLabel>Purchase Type</FieldLabel>
         <Select
-          value={entry.purchaseType}
-          onValueChange={(val) => onChange(entry.id, "purchaseType", val)}
+          value={
+            PURCHASE_OPTIONS.includes(entry.purchaseType)
+              ? entry.purchaseType
+              : entry.purchaseType
+                ? "Other"
+                : ""
+          }
+          onValueChange={(val) => {
+            if (val === "Other") {
+              onChange(entry.id, "purchaseType", "Other");
+            } else {
+              onChange(entry.id, "purchaseType", val);
+            }
+          }}
           disabled={isLoading}
         >
           <SelectTrigger
@@ -343,6 +363,30 @@ function SubmissionBlock({
             ))}
           </SelectContent>
         </Select>
+
+        {/* SHOW INPUT FIELD WHEN USER SELECT OTHER */}
+        {(entry.purchaseType === "Other" ||
+          (!PURCHASE_OPTIONS.includes(entry.purchaseType) &&
+            entry.purchaseType !== "")) && (
+          <Input
+            type="text"
+            placeholder="Please specify purchase type"
+            value={
+              PURCHASE_OPTIONS.includes(entry.purchaseType)
+                ? ""
+                : entry.purchaseType === "Other"
+                  ? ""
+                  : entry.purchaseType
+            }
+            onChange={(e) =>
+              onChange(entry.id, "purchaseType", e.target.value || "Other")
+            }
+            disabled={isLoading}
+            className={`${errors.purchaseType ? "border-destructive" : ""}`}
+            autoFocus
+          />
+        )}
+
         <FieldError message={errors.purchaseType} />
       </Field>
 
@@ -479,7 +523,16 @@ export default function FormContainer() {
   async function handleSubmit() {
     const validationErrors = validateForm(name, newsletterType, entries);
     setErrors(validationErrors);
-    if (hasErrors(validationErrors)) return;
+
+    // SCROLL WHEN THERE'S AN ERROR
+    if (hasErrors(validationErrors)) {
+      // LET REACT RE-RENDER WITH THE NEW ERRORS, THEN FIND AND SCROLL TO THE FIRST ONE
+      setTimeout(() => {
+        const firstError = document.querySelector(".border-destructive");
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -612,7 +665,7 @@ export default function FormContainer() {
             className={errors.name ? "border-destructive" : ""}
           />
           {errors.name && (
-            <p className="text-xs text-destructive mt-1">{errors.name}</p>
+            <p className="text-xs text-destructive">{errors.name}</p>
           )}
         </Field>
 
@@ -638,9 +691,7 @@ export default function FormContainer() {
             </SelectContent>
           </Select>
           {errors.newsletterType && (
-            <p className="text-xs text-destructive mt-1">
-              {errors.newsletterType}
-            </p>
+            <p className="text-xs text-destructive">{errors.newsletterType}</p>
           )}
         </Field>
 

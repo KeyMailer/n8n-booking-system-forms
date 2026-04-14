@@ -39,6 +39,7 @@ import FieldError from "@/components/field-error";
 import FormInformation from "./form-information";
 
 // HELPER FUNCTION
+import { containsUrl } from "@/lib/helper/contain-url";
 import { countWords } from "@/lib/helper/text-helper";
 
 // CONSTANT DATA
@@ -132,8 +133,13 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
 
 function validateForm(name: string, entries: SubmissionEntry[]): FormErrors {
   const errors: FormErrors = { entries: {} };
+  const trimmedName = name.trim();
 
-  if (!name.trim()) errors.name = "Name is required.";
+  if (!trimmedName) {
+    errors.name = "Name is required.";
+  } else if (containsUrl(trimmedName)) {
+    errors.name = "Name cannot contain links or URLs.";
+  }
 
   for (const entry of entries) {
     const entryErrors = validateEntry(entry);
@@ -508,7 +514,16 @@ export default function FormContainer() {
   async function handleSubmit() {
     const validationErrors = validateForm(name, entries);
     setErrors(validationErrors);
-    if (hasErrors(validationErrors)) return;
+
+    // SCROLL WHEN THERE'S AN ERROR
+    if (hasErrors(validationErrors)) {
+      // LET REACT RE-RENDER WITH THE NEW ERRORS, THEN FIND AND SCROLL TO THE FIRST ONE
+      setTimeout(() => {
+        const firstError = document.querySelector(".border-destructive");
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -641,7 +656,7 @@ export default function FormContainer() {
             className={errors.name ? "border-destructive" : ""}
           />
           {errors.name && (
-            <p className="text-xs text-destructive mt-1">{errors.name}</p>
+            <p className="text-xs text-destructive">{errors.name}</p>
           )}
         </Field>
 

@@ -25,6 +25,7 @@ export const PURCHASE_OPTIONS = [
   "Campaign",
   "Sales",
   "Free Press",
+  "Other",
 ];
 
 // SEGMENT - DROPDOWN
