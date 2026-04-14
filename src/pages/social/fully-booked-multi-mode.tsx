@@ -37,7 +37,7 @@ export default function SocialFullyBookedMultiMode({
 
         <p className="text-foreground max-w-xl">
           Unfortunately, bookings for Platinum, Gold, and Silver ad types are
-          fully booked. We only accept a maximum of 2 bookings per day for these
+          fully booked. We only accept a maximum of 5 bookings per day for these
           ad types.
         </p>
       </div>
