@@ -12,3 +12,4 @@ export const ORG_LINK_PREFIX = "https://madmin.keymailer.co/publishers/";
 export const PRODUCT_LINK_PREFIX =
   "https://madmin.keymailer.co/catalogue/products/";
 export const GOOGLE_DRIVE_PREFIX = "https://drive.google.com/drive/";
+export const STEAM_DB_PREFIX = "https://steamdb.info/";

@@ -52,6 +52,7 @@ import {
   ORG_LINK_PREFIX,
   PRODUCT_LINK_PREFIX,
   GOOGLE_DRIVE_PREFIX,
+  STEAM_DB_PREFIX,
 } from "./constants";
 
 // ======== TYPES SECTION ========
@@ -114,8 +115,11 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
 
   if (!entry.assetLink.trim()) {
     errors.assetLink = "Asset link is required.";
-  } else if (!entry.assetLink.startsWith(GOOGLE_DRIVE_PREFIX)) {
-    errors.assetLink = `Must start with ${GOOGLE_DRIVE_PREFIX}`;
+  } else if (
+    !entry.assetLink.startsWith(GOOGLE_DRIVE_PREFIX) &&
+    !entry.assetLink.startsWith(STEAM_DB_PREFIX)
+  ) {
+    errors.assetLink = `Must start with ${GOOGLE_DRIVE_PREFIX} or ${STEAM_DB_PREFIX}`;
   }
 
   if (!entry.socialPostType)
