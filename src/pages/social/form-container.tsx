@@ -64,7 +64,7 @@ interface SubmissionEntry {
   productName: string;
   organizationLink: string;
   productLink: string;
-  assetLink: string;
+  outputLink: string;
   socialPostType: string;
   adType: string;
   platform: string;
@@ -84,7 +84,7 @@ function createEmptyEntry(id: number): SubmissionEntry {
     productName: "",
     organizationLink: "",
     productLink: "",
-    assetLink: "",
+    outputLink: "",
     socialPostType: "",
     adType: "",
     platform: "",
@@ -113,13 +113,24 @@ function validateEntry(entry: SubmissionEntry): EntryErrors {
     errors.productLink = `Must start with ${PRODUCT_LINK_PREFIX}`;
   }
 
-  if (!entry.assetLink.trim()) {
-    errors.assetLink = "Asset link is required.";
-  } else if (
-    !entry.assetLink.startsWith(GOOGLE_DRIVE_PREFIX) &&
-    !entry.assetLink.startsWith(STEAM_DB_PREFIX)
-  ) {
-    errors.assetLink = `Must start with ${GOOGLE_DRIVE_PREFIX} or ${STEAM_DB_PREFIX}`;
+  // Output folder is optional for Bronze ad type
+  if (entry.adType !== "Bronze") {
+    if (!entry.outputLink.trim()) {
+      errors.outputLink = "Output folder is required.";
+    } else if (
+      !entry.outputLink.startsWith(GOOGLE_DRIVE_PREFIX) &&
+      !entry.outputLink.startsWith(STEAM_DB_PREFIX)
+    ) {
+      errors.outputLink = `Must start with ${GOOGLE_DRIVE_PREFIX} or ${STEAM_DB_PREFIX}`;
+    }
+  } else if (entry.outputLink.trim()) {
+    // Still validate format if they do provide a link
+    if (
+      !entry.outputLink.startsWith(GOOGLE_DRIVE_PREFIX) &&
+      !entry.outputLink.startsWith(STEAM_DB_PREFIX)
+    ) {
+      errors.outputLink = `Must start with ${GOOGLE_DRIVE_PREFIX} or ${STEAM_DB_PREFIX}`;
+    }
   }
 
   if (!entry.socialPostType)
@@ -256,18 +267,25 @@ function SubmissionBlock({
         <FieldError message={errors.productLink} />
       </Field>
 
-      {/* ASSET LINK */}
+      {/* OUTPUT FOLDER */}
       <Field>
-        <FieldLabel>Asset Folder</FieldLabel>
+        <FieldLabel>
+          Output Folder{" "}
+          {entry.adType === "Bronze" && (
+            <Badge variant="ghost" className="ml-auto">
+              optional
+            </Badge>
+          )}
+        </FieldLabel>
         <Input
           type="text"
-          placeholder="Enter google drive asset link"
-          value={entry.assetLink}
-          onChange={(e) => onChange(entry.id, "assetLink", e.target.value)}
+          placeholder="Enter google drive or steam db link"
+          value={entry.outputLink}
+          onChange={(e) => onChange(entry.id, "outputLink", e.target.value)}
           disabled={isLoading}
-          className={errors.assetLink ? "border-destructive" : ""}
+          className={errors.outputLink ? "border-destructive" : ""}
         />
-        <FieldError message={errors.assetLink} />
+        <FieldError message={errors.outputLink} />
       </Field>
 
       {/* SOCIAL POST TYPE */}
@@ -284,7 +302,10 @@ function SubmissionBlock({
             <SelectValue placeholder="Select a social post type" />
           </SelectTrigger>
           <SelectContent>
-            {SOCIAL_POST_TYPE.map((type) => (
+            {(entry.adType === "Bronze"
+              ? SOCIAL_POST_TYPE.filter((type) => type === "Image")
+              : SOCIAL_POST_TYPE
+            ).map((type) => (
               <SelectItem key={type} value={type}>
                 {type}
               </SelectItem>
@@ -464,6 +485,11 @@ export default function FormContainer() {
         if (e.id !== id) return e;
 
         const updated = { ...e, [field]: value };
+
+        // Reset socialPostType to "Image" if adType changes to Bronze
+        if (field === "adType" && value === "Bronze") {
+          updated.socialPostType = "Image";
+        }
 
         // If adType or socialPostType changed, check if selected date (today) is still valid
         if (field === "adType" || field === "socialPostType") {
