@@ -195,7 +195,9 @@ function SubmissionBlock({
   onRemove,
 }: SubmissionBlockProps) {
   const wordCount = countWords(entry.notes);
-  const today = new Date();
+  // ✅ Always use PHT regardless of browser timezone
+  const nowPH = new Date(Date.now() + 8 * 60 * 60 * 1000);
+  const today = new Date(nowPH.toISOString().slice(0, 10)); // midnight PHT
   const isSameDayAllowed =
     entry.adType === "Bronze" && entry.socialPostType === "Image";
 
