@@ -69,6 +69,7 @@ interface SubmissionEntry {
   adType: string;
   platform: string;
   date: Date | undefined;
+  copy: string;
   notes: string;
 }
 
@@ -89,6 +90,7 @@ function createEmptyEntry(id: number): SubmissionEntry {
     adType: "",
     platform: "",
     date: undefined,
+    copy: "",
     notes: "",
   };
 }
@@ -395,6 +397,23 @@ function SubmissionBlock({
           </SelectContent>
         </Select>
         <FieldError message={errors.platform} />
+      </Field>
+
+      {/* COPY */}
+      <Field>
+        <FieldLabel>
+          Copy
+          <Badge variant="ghost" className="ml-auto">
+            optional
+          </Badge>
+        </FieldLabel>
+        <Input
+          type="text"
+          placeholder="Add preferred copy..."
+          value={entry.copy}
+          onChange={(e) => onChange(entry.id, "copy", e.target.value)}
+          disabled={isLoading}
+        />
       </Field>
 
       {/* NOTES */}
